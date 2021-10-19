@@ -42,23 +42,6 @@ fn client_protocol(set_size: usize, channel: &mut TrackChannel<SymChannel<TcpStr
     let p1_input_a = util::cmult_vec(p1_input, a);
     println!("client :: computed p1^a {:?} ms", time.elapsed().unwrap().as_millis());
 
-    let time = SystemTime::now();
-    // P1 reads points from P2 and shuffles
-    let mut p2_input_b = util::receive_pts(channel);
-    p2_input_b.shuffle(&mut rng_shuffle);
-    println!("client :: received p2^b in {:?} ms", time.elapsed().unwrap().as_millis());
-    println!("client :: communication received {:?} in Mb", channel.kilobits_read() / 1000.0);
-    read_total = read_total + channel.kilobits_read() / 1000.0;
-
-    let time = SystemTime::now();
-    let p2_input_ab = util::cmult_vec(p2_input_b, a);
-    println!("client :: computed p2^ab in {:?} ms", time.elapsed().unwrap().as_millis());
-
-    let time = SystemTime::now();
-    util::send_pts(p2_input_ab.clone(), channel);
-    println!("client :: sent p2^ab in {:?} ms", time.elapsed().unwrap().as_millis());
-    println!("client :: communication sent {:?} in Mb", channel.kilobits_written() / 1000.0);
-    write_total = write_total + channel.kilobits_written() / 1000.0;
 
     let time = SystemTime::now();
     util::send_pts(p1_input_a, channel);
@@ -71,6 +54,23 @@ fn client_protocol(set_size: usize, channel: &mut TrackChannel<SymChannel<TcpStr
     println!("client :: received p1^ab in {:?} ms", time.elapsed().unwrap().as_millis());
     println!("client :: communication received {:?} in Mb", channel.kilobits_read() / 1000.0);
     read_total = read_total + channel.kilobits_read() / 1000.0;
+
+    let time = SystemTime::now();
+    let mut p2_input_b = util::receive_pts(channel);
+    p2_input_b.shuffle(&mut rng_shuffle);
+    println!("client :: received p2^b in {:?} ms", time.elapsed().unwrap().as_millis());
+    println!("client :: communication received {:?} in Mb", channel.kilobits_read() / 1000.0);
+    read_total = read_total + channel.kilobits_read() / 1000.0;
+
+    let time = SystemTime::now();
+    let p2_input_ab = util::cmult_vec(p2_input_b, a);
+    println!("client :: computed p2^ab in {:?} ms", time.elapsed().unwrap().as_millis());
+
+    // let time = SystemTime::now();
+    // util::send_pts(p2_input_ab.clone(), channel);
+    // println!("client :: sent p2^ab in {:?} ms", time.elapsed().unwrap().as_millis());
+    // println!("client :: communication sent {:?} in Mb", channel.kilobits_written() / 1000.0);
+    // write_total = write_total + channel.kilobits_written() / 1000.0;
 
     let time = SystemTime::now();
     let intersection_size = util::intersect_size(p1_input_ab, p2_input_ab);
